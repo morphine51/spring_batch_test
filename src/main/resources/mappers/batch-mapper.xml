@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  @FileName    : batch-mapper.xml
+  @Date        : 2018. 12. 10.
+  @Author      : hkpark
+  @Description : batchJobRepository 데이터 삭제와 작업 밀림, 스레드 멈춤 조회를 위한 Mapper xml
+  @History     : [20181210] 최초작성.
+ -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.mphine.batch.mapper.BatchMapper">
+	
+	<select id="setReferentialIntegrityOff">
+		SET REFERENTIAL_INTEGRITY FALSE
+	</select>	
+	
+	<delete id="deleteBatchJobExecution">		
+		DELETE
+		FROM BATCH_JOB_EXECUTION
+		WHERE JOB_EXECUTION_ID NOT IN 
+			(
+				(SELECT JOB_EXECUTION_ID 
+									FROM BATCH_JOB_EXECUTION 
+									WHERE END_TIME IS NOT NULL
+									ORDER BY JOB_INSTANCE_ID DESC LIMIT #{remainRecordCountForDelete})
+				 UNION ALL
+				(SELECT JOB_EXECUTION_ID 
+									FROM BATCH_JOB_EXECUTION
+									WHERE END_TIME IS NULL)
+			)
+	</delete>
+		
+	<delete id="deleteBatchJobInstance">
+		DELETE
+		FROM BATCH_JOB_INSTANCE
+		WHERE JOB_INSTANCE_ID NOT IN 
+		(			
+			SELECT JOB_INSTANCE_ID 
+			FROM BATCH_JOB_EXECUTION
+		)
+	</delete>
+	
+	<delete id="deleteBatchJobExecutionParams">
+		DELETE FROM BATCH_JOB_EXECUTION_PARAMS
+		WHERE JOB_EXECUTION_ID NOT IN
+		(			
+			SELECT JOB_EXECUTION_ID 
+			FROM BATCH_JOB_EXECUTION
+		)
+	</delete>	
+	
+	<delete id="deleteBatchJobExecutionContext">
+		DELETE FROM BATCH_JOB_EXECUTION_CONTEXT
+		WHERE JOB_EXECUTION_ID NOT IN
+		(			
+			SELECT JOB_EXECUTION_ID 
+			FROM BATCH_JOB_EXECUTION						
+		)
+	</delete>	
+	
+	<delete id="deleteBatchStepExecution">
+		DELETE FROM BATCH_STEP_EXECUTION
+		WHERE JOB_EXECUTION_ID NOT IN
+		(			
+			SELECT JOB_EXECUTION_ID 
+			FROM BATCH_JOB_EXECUTION
+		)
+	</delete>	
+	
+	<delete id="deleteBatchStepExecutionContext">
+		DELETE FROM BATCH_STEP_EXECUTION_CONTEXT
+		WHERE STEP_EXECUTION_ID NOT IN
+			(
+				SELECT STEP_EXECUTION_ID
+				FROM BATCH_STEP_EXECUTION
+			)
+	</delete>
+	
+	<select id="setReferentialIntegrityOn">
+		SET REFERENTIAL_INTEGRITY TRUE
+	</select>
+	
+	<select id="selectBatchProcessDelayList" resultType="String">
+		SELECT 
+			JEP.STRING_VAL FILE_NAME
+		FROM BATCH_JOB_EXECUTION JE 
+			INNER JOIN BATCH_JOB_EXECUTION_PARAMS JEP
+			ON JE.JOB_EXECUTION_ID = JEP.JOB_EXECUTION_ID
+			INNER JOIN BATCH_STEP_EXECUTION SE
+			ON JE.JOB_EXECUTION_ID = SE.JOB_EXECUTION_ID
+		WHERE JEP.KEY_NAME = 'fileName'
+			AND (JE.STATUS = 'STARTED' or JE.status = 'STARTING')
+			AND DATEDIFF('SECOND', JE.START_TIME, CURRENT_TIMESTAMP) <![CDATA[>=]]> #{jobDelaySecondForSelect}
+			AND (SE.STATUS = 'STARTED' or SE.status = 'STARTING')
+	</select>
+	
+	<select id="selectBatchJobAvgExecutionTimeRecentlyFiveInfo">
+		SELECT A.JOB_INSTANCE_ID, A.FILE_NAME, A.START_TIME, A.END_TIME, A.JOB_EXECUTION_TIME, B.AVG_JOB_EXECUTION_TIME
+		FROM
+		(
+			SELECT JOB_INSTANCE_ID, JEP.STRING_VAL FILE_NAME,
+			START_TIME, END_TIME, DATEDIFF('MILLISECOND', START_TIME, END_TIME) / 1000.0 JOB_EXECUTION_TIME
+			FROM
+			BATCH_JOB_EXECUTION JE 
+			INNER JOIN BATCH_JOB_EXECUTION_PARAMS JEP
+			ON JE.JOB_EXECUTION_ID = JEP.JOB_EXECUTION_ID
+			WHERE JEP.KEY_NAME = 'fileName' and JE.STATUS = 'COMPLETED'
+			ORDER BY JOB_INSTANCE_ID DESC
+			LIMIT 5
+		) A,
+		(
+		SELECT ROUND(AVG(JOB_EXECUTION_TIME), 3) AVG_JOB_EXECUTION_TIME
+		FROM
+		(
+			SELECT 
+			DATEDIFF('MILLISECOND', START_TIME, END_TIME) / 1000.0 JOB_EXECUTION_TIME
+			FROM
+			BATCH_JOB_EXECUTION 
+			WHERE STATUS = 'COMPLETED'
+			ORDER BY JOB_INSTANCE_ID DESC
+			LIMIT 5
+		)) B 
+	</select>
+	
+	<select id="selectBatchJobAvgExecutionTimeRecentlyFive" resultType="java.lang.Double">
+		SELECT ROUND(AVG(JOB_EXECUTION_TIME), 3) AVG_JOB_EXECUTION_TIME
+		FROM
+		(
+			SELECT 
+			DATEDIFF('MILLISECOND', START_TIME, END_TIME) / 1000.0 JOB_EXECUTION_TIME
+			FROM
+			BATCH_JOB_EXECUTION
+			where status = 'COMPLETED'
+			ORDER BY JOB_INSTANCE_ID DESC
+			LIMIT 5
+		)
+	</select>
+</mapper>

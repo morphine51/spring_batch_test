@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+  @FileName    : mybatis-config.xml
+  @Date        : 2018. 12. 10.
+  @Author      : hkpark
+  @Description : mybatis 설정 xml
+  @History     : [20181210] 최초작성.
+ -->
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<!-- lazyLoadingEnabled: 지연로딩을 사용할지에 대한 여부. 사용하지 않는다면 모두 즉시 로딩할 것이다. default: false -->
+		<setting name="lazyLoadingEnabled"        value="true"    />
+		<!-- cacheEnabled: 설정에서 각 매퍼에 설정된 캐시를 전역적으로 사용할지 말지에 대한 여부 default: true -->
+		<setting name="cacheEnabled"              value="true"    />
+		<!-- useGeneratedKeys: 생성키에 대한 JDBC 지원을 허용. true로 설정하면 생성키를 강제로 생성한다. default: False -->
+		<setting name="useGeneratedKeys"          value="true"    />
+		<!-- jdbcTypeForNull: JDBC타입을 파라미터에 제공하지 않을때 null값을 처리한 JDBC타입을 명시한다.  -->
+		<setting name="jdbcTypeForNull"           value="NULL"    />
+		<!--
+		<setting name="useStatementNamespace"     value="true"    />
+		<setting name="useColumnLabel"            value="true"    />
+		<setting name="multipleResultSetsEnabled" value="true"    />
+		<setting name="mapUnderscoreToCamelCase"  value="true"    />
+		-->
+		<!-- defaultStatementTimeout: 데이터베이스로의 응답을 얼마나 오래 기다릴지를 판단하는 타임아웃을 설정 -->
+		<setting name="defaultStatementTimeout"   value="1200"   />
+		<!-- //디폴트 실행자(executor) 설정.
+			   SIMPLE 실행자는 특별히 하는 것이 없다. 
+			   REUSE 실행자는 PreparedStatement 를 재사용한다. 
+			   BATCH 실행자는 구문을 재사용하고 수정을 배치처리한다. -->
+		<setting name="defaultExecutorType"       value="REUSE"   /> <!-- //SIMPLE -->
+		<!-- //마이바티스는 순환참조를 막거나 반복된 쿼리의 속도를 높히기 위해 로컬캐시를 사용한다. 
+			   디폴트 설정인 SESSION을 사용해서 동일 세션의 모든 쿼리를 캐시한다.
+			   localCacheScope=STATEMENT 로 설정하면 로컬 세션은 구문 실행할때만 사용하고 
+			   같은 SqlSession에서 두개의 다른 호출사이에는 데이터를 공유하지 않는다. -->
+		<setting name="localCacheScope"           value="SESSION" /> <!-- //STATEMENT -->
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+	</settings>	
+	
+</configuration>
