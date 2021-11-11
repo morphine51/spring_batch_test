@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -24,7 +25,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,7 +34,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import com.mphine.batch.OneStep;
 import com.mphine.batch.TaskCutOff;
@@ -46,7 +46,6 @@ import com.mphine.batch.TaskInsertVmsVideoInfo;
 import com.mphine.batch.TaskRecFileSizeCheck;
 import com.mphine.batch.TaskRecordFileMove;
 import com.mphine.batch.listener.JobListener;
-import com.mphine.batch.listener.OneStepListener;
 import com.mphine.batch.listener.StepListener;
 
 /**
@@ -59,9 +58,9 @@ import com.mphine.batch.listener.StepListener;
  * 
  */
 
-@Configuration
-@EnableBatchProcessing
-public class BatchConfig {
+//@Configuration
+//@EnableBatchProcessing
+public class InMemoryBatchConfig {
 
 	@Autowired
 	private JobBuilderFactory jobBuilderFactory;
@@ -74,9 +73,6 @@ public class BatchConfig {
 	
 	@Autowired
 	private StepListener stepListener;	
-	
-	@Autowired
-	private OneStepListener oneStepListener;
 	
 	@Autowired
 	private TaskRecFileSizeCheck taskRecFileSizeCheck;
@@ -137,29 +133,6 @@ public class BatchConfig {
     	taskExecutor.initialize();
         return taskExecutor;
 	}	
-	
-	/**
-	 * jobRepository 설정
-	 * @param batchDataSource
-	 * @return
-	 * @throws Exception
-	 */
-	@Bean
-	public JobRepository jobRepository(@Qualifier("batchDataSource") DataSource batchDataSource) throws Exception {
-	    JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-	    factory.setTransactionManager(transactionManager());
-	    factory.setDataSource(batchDataSource);
-	    return factory.getObject();
-	}
-	
-	/**
-	 * batch transactionManager 설정
-	 * @return
-	 */
-	@Bean
-	public PlatformTransactionManager transactionManager() {
-	    return new ResourcelessTransactionManager();
-	}
 	
 	/**
 	 * jobLaucher 설정
@@ -289,7 +262,7 @@ public class BatchConfig {
 	@Bean("vworkOnStep")
 	public Step vworkOneStep() {
 		return stepBuilderFactory.get("vworkOneStep")
-				.listener(oneStepListener).tasklet(oneStep).build();
+				.listener(stepListener).tasklet(oneStep).build();
 	}
 	
 	@Bean("vworkOneStepJob")

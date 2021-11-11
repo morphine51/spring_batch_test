@@ -18,12 +18,11 @@ spring:
         initialize: false
         driverClassName: org.h2.Driver
         jdbcUrl: jdbc:h2:tcp://localhost:9092/mem:h2database;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL
-        #jdbcUrl: jdbc:h2:tcp://localhost:19092/mem:h2database;MODE=MYSQL
-        #jdbcUrl: jdbc:h2://localhost:19092/mem:h2database;MODE=MYSQL
         username: sa
         password: 1234
         maximumPoolSize: 10
-      initialize-schema: ALWAYS
+      #initialize-schema: ALWAYS
+      initialize-schema: never
       history:
         jobDelaySecondForSelect: 10
         remainRecordCountForDelete: 5        

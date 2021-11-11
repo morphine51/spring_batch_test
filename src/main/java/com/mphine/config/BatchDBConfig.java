@@ -16,7 +16,6 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.h2.tools.Server;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
@@ -32,7 +31,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-
 /**
  * 
  * @FileName    : BatchDBConfig.java
@@ -43,15 +41,16 @@ import com.zaxxer.hikari.HikariDataSource;
  * 
  */
 
-//@Configuration
-//@MapperScan(value="com.mphine.batch.mapper", sqlSessionFactoryRef="batchSqlSessionFactory")
-//@EnableTransactionManagement
+@Configuration
+@MapperScan(value="com.mphine.batch.mapper", sqlSessionFactoryRef="batchSqlSessionFactory")
+@EnableTransactionManagement
 public class BatchDBConfig {
- /*
+ 
 	@Bean(name = "batchDataSource")
 	@Primary
 	@ConfigurationProperties(prefix="spring.batch.datasource") 
 	public DataSource batchDataSource() throws SQLException {
+		// 자체적으로 h2db 구동
 //		Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9092").start();
 		HikariDataSource hikariDataSource = new HikariDataSource();
 		hikariDataSource.setPoolName("hikari-pool-h2");
@@ -79,5 +78,5 @@ public class BatchDBConfig {
  
         return new SqlSessionTemplate(batchSqlSessionFactory);
     }  
-*/
+
 }
