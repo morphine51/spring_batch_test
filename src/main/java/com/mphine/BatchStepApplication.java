@@ -48,8 +48,8 @@ public class BatchStepApplication implements CommandLineRunner {
 					.addString("logKey", logKey)
 					.toJobParameters();						
 				
-			jobLauncher.run(vworkJob, params);
-//			jobLauncher.run(vworkOneStepJob, params);
+//			jobLauncher.run(vworkJob, params);
+			jobLauncher.run(vworkOneStepJob, params);
 			
 //		}
 	}

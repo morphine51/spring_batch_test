@@ -38,8 +38,8 @@ public class TaskRecFileSizeCheck implements Tasklet{
 		
 		MDC.put("LOG_KEY",logKey);
 		
-		log.info("[{}] TaskRecFileSizeCheck", fileName);		
-				
+		log.info("[{}] TaskRecFileSizeCheck", fileName);	
+		
 		return RepeatStatus.FINISHED;
 	}	
 }

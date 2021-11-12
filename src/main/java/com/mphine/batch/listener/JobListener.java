@@ -58,6 +58,13 @@ public class JobListener extends JobExecutionListenerSupport{
             log.debug("[{}] job success", fileName);                      		
     		
         } else {
+        	
+        	String exceptionStepName = 
+    				jobExecution.getExecutionContext().get("exceptionStepName") == null 
+    					? "" : jobExecution.getExecutionContext().get("exceptionStepName").toString();
+        	
+        	log.error("####### Exception : "+exceptionStepName);
+        	
         	log.debug("[{}] job fail", fileName);
         	
         }

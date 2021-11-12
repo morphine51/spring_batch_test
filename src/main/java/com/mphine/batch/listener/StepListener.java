@@ -38,7 +38,7 @@ public class StepListener extends StepExecutionListenerSupport{
     	log.debug("taskletlStepListener afterStep");
     	
     	log.debug("step Batch status: {}", stepExecution.getStatus());
-    	log.debug("step name: {}", stepExecution.getStepName());            	
+    	log.debug("step name: {}", stepExecution.getStepName());          
     	
     	if(stepExecution.getStatus() == BatchStatus.FAILED) {
     		

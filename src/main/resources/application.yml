@@ -21,8 +21,8 @@ spring:
         username: sa
         password: 1234
         maximumPoolSize: 10
-      #initialize-schema: ALWAYS
-      initialize-schema: never
+      initialize-schema: ALWAYS
+      #initialize-schema: never
       history:
         jobDelaySecondForSelect: 10
         remainRecordCountForDelete: 5        
